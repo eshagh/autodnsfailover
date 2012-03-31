@@ -36,7 +36,7 @@ class ZerigoDns(object):
     def getARecords(self, fqdn):
         hostname = self._hostname(fqdn)
         return [h.data
-                for h in self._zone.hosts
+                for h in self._zone.find_by_hostname(hostname)
                 if h.hostname==hostname and h.host_type=='A']
 
     def addARecord(self, fqdn, a):
