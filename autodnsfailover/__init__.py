@@ -59,9 +59,16 @@ class DynectDns(object):
             
     def delARecord(self, fqdn, a):
         with session(self) as s:
-            s.call('DeleteOneARecord',
-                   fqdn = fqdn,
-                   rdata = dict(address=a))
+            try:
+                records = s.call('GetARecords',
+                                 fqdn = fqdn)
+            except ValueError, AttributeError:
+                return
+            for r in records:
+                if r.rdata.address == a:
+                    s.call('DeleteOneARecord',
+                           fqdn = fqdn,
+                           record_id = r.record_id)
             s.call('PublishZone')
 
     def getARecords(self, fqdn):
