@@ -5,10 +5,74 @@ import httplib
 import os
 import select
 import signal
+import suds
 import time
 import urllib
 import zerigodns
 #import route53
+
+
+# This should probably by named "dynectsession" instead.
+class session(object):
+
+    def __init__(self, config):
+        self.config = config
+        
+    def __enter__(self):
+        self.client = suds.client.Client(self.config.base_url)
+        self.token = None
+        self.token = self.call('SessionLogin',
+                               customer_name = self.config.customer_name,
+                               user_name = self.config.user_name,
+                               password = self.config.password).token
+        return self
+
+    def call(self, method_name, **parameters):
+        parameters['token'] = self.token
+        parameters['zone'] = self.config.zone
+        parameters['fault_incompat'] = 1
+        response = getattr(self.client.service, method_name)(**parameters)
+        if response.status != 'success':
+            raise ValueError(response)
+        return response.data
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None: # all went well, try to logout cleanly
+            self.call('SessionLogout')
+        return False # propagate any exception
+
+
+class DynectDns(object):
+    """
+    Updates a DNS zone hosted by DynECT (http://dyn.com/dns/).
+    """
+    def __init__(self, config):
+        for k,v in config.items():
+            setattr(self, k, v)
+
+    def addARecord(self, fqdn, a):
+        with session(self) as s:
+            s.call('CreateARecord',
+                   fqdn = fqdn,
+                   rdata = dict(address=a))
+            s.call('PublishZone')
+            
+    def delARecord(self, fqdn, a):
+        with session(self) as s:
+            s.call('DeleteOneARecord',
+                   fqdn = fqdn,
+                   rdata = dict(address=a))
+            s.call('PublishZone')
+
+    def getARecords(self, fqdn):
+        with session(self) as s:
+            try:
+                records = s.call('GetARecords',
+                                 fqdn = fqdn)
+                return [r.rdata.address for r in records]
+            except ValueError, AttributeError:
+                return []
+
 
 class ZerigoDns(object):
     """

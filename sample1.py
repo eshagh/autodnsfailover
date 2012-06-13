@@ -14,6 +14,14 @@ dns = autodnsfailover.ZerigoDns('zerigo@example.com',
                                 '1234567890',
                                 'example.com')
 
+# ... Alternatively, use the DynECT API
+dns = autodnsfailover.DynectDns(dict(
+    base_url='https://api2.dynect.net/wsdl/current/Dynect.wsdl',
+    customer_name='mycompany',
+    user_name='johndoe',
+    password='superduperdns',
+    zone='example.com'))
+
 # Implementation to be used to check if a server is alive
 check = autodnsfailover.HttpCheck()
 

@@ -74,6 +74,10 @@ ZerigoDns is the reference class for this interface. It is useful only if your z
 
 A boto implementation (allowing to update records located on AWS Route53) is now available! See sample3.py for an example of how to use it.
 
+### Dynect
+
+The DynectDns class implements the interface for [DynECT](http://dyn.com/dns/). The overall concept is quite similar to Zerigo, but it uses the `suds` package to call the DynECT SOAP API.
+
 ### DDNS
 
 TBD.
