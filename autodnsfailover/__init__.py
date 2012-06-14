@@ -232,7 +232,10 @@ def boundedCheck(target, check, timer, logger):
     # (and select() on that pipe)
     pipe = os.pipe()
     def sigchld(sig, frame):
-        os.write(pipe[1], ' ')
+        try:
+            os.write(pipe[1], ' ')
+        except:
+            pass
     signal.signal(signal.SIGCHLD, sigchld)
     pid = os.fork()
     if pid:
