@@ -29,9 +29,14 @@ class session(object):
 
     def call(self, method_name, **parameters):
         parameters['token'] = self.token
-        parameters['zone'] = self.config.zone
+        # Some methods do not need the zone parameter.
+        if method_name not in ['GetJob']:
+            parameters['zone'] = self.config.zone
         parameters['fault_incompat'] = 1
         response = getattr(self.client.service, method_name)(**parameters)
+        if response.status == 'incomplete':
+            # Retry!
+            return self.call('GetJob', job_id=response.job_id)
         if response.status != 'success':
             raise ValueError(response)
         return response.data
