@@ -37,13 +37,19 @@ class session(object):
         if response.status == 'incomplete':
             # Retry!
             return self.call('GetJob', job_id=response.job_id)
-        if response.status != 'success':
-            raise ValueError(response)
-        if 'data' in response:
-            return response.data
-        else:
-            return None
-        # Those two last lines are redundant, but they help with readability!
+        if response.status == 'success':
+            if 'data' in response:
+                return response.data
+            else:
+                return None
+        if response.status == 'failure':
+            for msg in response.msgs:
+                # Translate NOT_FOUND errors into silent errors,
+                # instead of raising an exception.
+                if 'err_cd' in msg and msg.err_cd == 'NOT_FOUND':
+                    return None
+        # If we reach that point, we are in trouble; raise an exception.
+        raise ValueError(response)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None: # all went well, try to logout cleanly
