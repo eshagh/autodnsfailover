@@ -39,7 +39,11 @@ class session(object):
             return self.call('GetJob', job_id=response.job_id)
         if response.status != 'success':
             raise ValueError(response)
-        return response.data
+        if 'data' in response:
+            return response.data
+        else:
+            return None
+        # Those two last lines are redundant, but they help with readability!
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None: # all went well, try to logout cleanly
@@ -78,11 +82,11 @@ class DynectDns(object):
 
     def getARecords(self, fqdn):
         with session(self) as s:
-            try:
-                records = s.call('GetARecords',
-                                 fqdn = fqdn)
+            records = s.call('GetARecords',
+                             fqdn = fqdn)
+            if records:
                 return [r.rdata.address for r in records]
-            except ValueError, AttributeError:
+            else:
                 return []
 
 
