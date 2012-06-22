@@ -49,7 +49,7 @@ class session(object):
                 if 'err_cd' in msg and msg.err_cd == 'NOT_FOUND':
                     return None
         # If we reach that point, we are in trouble; raise an exception.
-        raise ValueError(response)
+        raise ValueError(str(response))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None: # all went well, try to logout cleanly
