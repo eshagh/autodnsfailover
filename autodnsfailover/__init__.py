@@ -34,6 +34,10 @@ class session(object):
             parameters['zone'] = self.config.zone
         parameters['fault_incompat'] = 1
         response = getattr(self.client.service, method_name)(**parameters)
+        # GetJob requests are special; the real response is nested
+        if method_name == 'GetJob' and response.status == 'success':
+            response = response.data
+        # Now proceed with regular handling
         if response.status == 'incomplete':
             # Retry!
             return self.call('GetJob', job_id=response.job_id)
