@@ -78,6 +78,10 @@ A boto implementation (allowing to update records located on AWS Route53) is now
 
 The DynectDns class implements the interface for [DynECT](http://dyn.com/dns/). The overall concept is quite similar to Zerigo, but it uses the `suds` package to call the DynECT SOAP API.
 
+### CloudFlare
+
+CloudFlareDns class implements the interface for [CloudFlare](https://www.cloudflare.com/). The overall concept is quite similar to Zerigo, but it uses the `requests` package to call the [CloudFlare Client API](http://www.cloudflare.com/docs/client-api.html).
+
 ### DDNS
 
 TBD.

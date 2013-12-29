@@ -11,5 +11,5 @@ setup(
     author_email='jerome.petazzoni@dotcloud.com',
     url='http://github.com/dotcloud/autodnsfailover',
     packages=['autodnsfailover'],
-    install_requires=['zerigodns','boto','suds']
+    install_requires=['zerigodns','boto','suds','requests']
     )
